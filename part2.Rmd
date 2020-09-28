@@ -1,0 +1,93 @@
+---
+title: "Basic Inferential Data Analysis"
+author: "David Marquinez"
+output:
+  pdf_document: default
+  html_document:
+    keep_md: yes
+---
+```{r setup, warning= FALSE , include= FALSE , echo = TRUE}
+library(R.utils)
+library(ggplot2)
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color, 
+      x)
+  } else x
+}
+```
+
+## Overview  
+
+The data we are going to use is a study of the effect of vitamin C on tooth growth in guinea pig.  
+
+## Summary of the data  
+
+We are going to see the structure and a quick view to the data.
+```{r echo=TRUE}
+data("ToothGrowth")
+str(ToothGrowth)
+```  
+The tooth length 
+```{r echo=TRUE}
+summary(ToothGrowth$len)
+```  
+The dose were `r unique(ToothGrowth$dose)` in miligrams/day.  
+The supplement type were coded as `r colorize("OJ","orange")`,`r colorize("VC","blue")` and they mean `r colorize("orange juice","orange")` or `r colorize("ascorbic acid","blue")` (a form of vitamin C).  
+
+## Comparation   
+
+```{r echo=TRUE}
+levels(ToothGrowth$supp) <- c("Orange Juice", "Ascorbic Acid")
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+g <- ggplot(ToothGrowth, 
+            aes(x = dose, y = len, color = supp))
+g + facet_grid(. ~ supp) + 
+  geom_boxplot( aes(fill = supp),show.legend = F) +
+  scale_fill_manual(values = c("orange", "blue")) +
+  xlab("Dose (mg/day)") + ylab("Length")
+```  
+
+## Hypothesis Tests  
+
+### H0: Both delivery modes of Vitamin C have the same influence on tooth growth. 
+
+```{r echo=TRUE}
+len <- ToothGrowth$len
+supp <- ToothGrowth$supp
+dose <- ToothGrowth$dose
+t1 <- t.test(len[supp=="Orange Juice"],len[supp=="Ascorbic Acid"],paired=F,conf.level = 0.95)
+```  
+
+The confidence interval is `r t1$conf.int[1:2]` with a confidence level of `r 100*attr(t1$conf.int,"conf.level")` % and the p-value is `r t1$p.value` greather than 0.05.  
+We do not reject the null hypothesis.  
+
+### H1 With a dose of 0.5 mg/day the two delivery methods have the same influence on tooth growth.  
+```{r echo=TRUE}
+t2 <- t.test(len[supp=="Orange Juice" & dose==0.5] , len[supp=="Ascorbic Acid" & dose==0.5], paired=F, conf.level = 0.95)
+```  
+
+The confidence interval is `r t2$conf.int[1:2]` with a confidence level of `r 100*attr(t2$conf.int,"conf.level")` % and the p-value is `r t2$p.value` much lower than 0.05.  
+We  reject the null hypothesis.  
+
+### H2 With a dose of 1 mg/day the two delivery methods have the same influence on tooth growth.  
+```{r echo=TRUE}
+t2 <- t.test(len[supp=="Orange Juice" & dose==1] , len[supp=="Ascorbic Acid" & dose==1], paired=F, conf.level = 0.95)
+```  
+
+The confidence interval is `r t2$conf.int[1:2]` with a confidence level of `r 100*attr(t2$conf.int,"conf.level")` % and the p-value is `r t2$p.value` much lower than 0.05.  
+We  reject the null hypothesis.  
+
+### H3 With a dose of 2 mg/day the two delivery methods have the same influence on tooth growth.  
+```{r echo=TRUE}
+t2 <- t.test(len[supp=="Orange Juice" & dose==2] , len[supp=="Ascorbic Acid" & dose==2], paired=F, conf.level = 0.95)
+```  
+
+The confidence interval is `r t2$conf.int[1:2]` with a confidence level of `r 100*attr(t2$conf.int,"conf.level")` % and the p-value is `r t2$p.value` greather than 0.05.  
+We  do not reject the null hypothesis.
+
+## Conclusion  
+#### **`r colorize("Orange Juice","orange")`** has more influence on tooth growth with a dose < 2 mg/day compared to **`r colorize("Ascorbic Acid","blue")`**.  
+#### With a dose of 2 mg/day both delivery methods have the same influence.
