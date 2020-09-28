@@ -2,9 +2,9 @@
 title: "Basic Inferential Data Analysis"
 author: "David Marquinez"
 output:
-  #pdf_document: default
   html_document:
     keep_md: yes
+  pdf_document: default
 ---
 
 
@@ -65,7 +65,9 @@ g + facet_grid(. ~ supp) +
 len <- ToothGrowth$len
 supp <- ToothGrowth$supp
 dose <- ToothGrowth$dose
-t1 <- t.test(len[supp=="Orange Juice"],len[supp=="Ascorbic Acid"],paired=F,conf.level = 0.95)
+t1 <- t.test(len[supp=="Orange Juice"],
+             len[supp=="Ascorbic Acid"],
+             paired=F,conf.level = 0.95)
 ```
 
 The confidence interval is -0.1710156, 7.5710156 with a confidence level of 95 % and the p-value is 0.0606345 greather than 0.05.  
@@ -74,7 +76,9 @@ We do not reject the null hypothesis.
 ### H1 With a dose of 0.5 mg/day the two delivery methods have the same influence on tooth growth.  
 
 ```r
-t2 <- t.test(len[supp=="Orange Juice" & dose==0.5] , len[supp=="Ascorbic Acid" & dose==0.5], paired=F, conf.level = 0.95)
+t2 <- t.test(len[supp=="Orange Juice" & dose==0.5] ,
+             len[supp=="Ascorbic Acid" & dose==0.5],
+             paired=F, conf.level = 0.95)
 ```
 
 The confidence interval is 1.7190573, 8.7809427 with a confidence level of 95 % and the p-value is 0.0063586 much lower than 0.05.  
@@ -83,7 +87,9 @@ We  reject the null hypothesis.
 ### H2 With a dose of 1 mg/day the two delivery methods have the same influence on tooth growth.  
 
 ```r
-t2 <- t.test(len[supp=="Orange Juice" & dose==1] , len[supp=="Ascorbic Acid" & dose==1], paired=F, conf.level = 0.95)
+t2 <- t.test(len[supp=="Orange Juice" & dose==1] ,
+             len[supp=="Ascorbic Acid" & dose==1], 
+             paired=F, conf.level = 0.95)
 ```
 
 The confidence interval is 2.8021482, 9.0578518 with a confidence level of 95 % and the p-value is 0.0010384 much lower than 0.05.  
@@ -92,12 +98,14 @@ We  reject the null hypothesis.
 ### H3 With a dose of 2 mg/day the two delivery methods have the same influence on tooth growth.  
 
 ```r
-t2 <- t.test(len[supp=="Orange Juice" & dose==2] , len[supp=="Ascorbic Acid" & dose==2], paired=F, conf.level = 0.95)
+t2 <- t.test(len[supp=="Orange Juice" & dose==2] ,
+             len[supp=="Ascorbic Acid" & dose==2],
+             paired=F, conf.level = 0.95)
 ```
 
 The confidence interval is -3.7980705, 3.6380705 with a confidence level of 95 % and the p-value is 0.9638516 greather than 0.05.  
 We  do not reject the null hypothesis.
 
 ## Conclusion  
-#### **<span style='color: orange;'>Orange Juice</span>** has more influence on tooth growth with a dose < 2 mg/day compared to **<span style='color: blue;'>Ascorbic Acid.</span>**.  
+#### **<span style='color: orange;'>Orange Juice</span>** has more influence on tooth growth with a dose < 2 mg/day compared to **<span style='color: blue;'>Ascorbic Acid</span>**.  
 #### With a dose of 2 mg/day both delivery methods have the same influence.
