@@ -1,0 +1,107 @@
+---
+title: "Simulation exercise"
+author: "David Marquinez"
+output:
+  pdf_document: default
+  html_document:
+    keep_md: yes
+---
+```{r setup, warning= FALSE , include= FALSE , echo = TRUE}
+library(R.utils)
+library(ggplot2)
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color, 
+      x)
+  } else x
+}
+```
+
+## Overview
+
+In this analysis we will investigate the exponential distribution and compare it with the Central Limit Theorem. We will set lambda = 0.2 for all of the simulations. We will investigate the distribution of averages of 40 exponentials over a thousand simulations.    
+
+## Simulations  
+
+Setting the variables for lambda, the total number of simulations, the number of exponentials. The seed is setted to 588 in order to make this analysis reproducible.
+
+```{r echo = TRUE}
+lambda = 0.2
+n = 1000
+exp = 40
+set.seed(588)
+mns = NULL
+```  
+
+Simulating the data and calculating the mean of each simulation.
+
+```{r echo = TRUE}
+for(i in 1:n) mns = c(mns,mean(rexp(40,lambda)))
+```  
+
+## Sample Mean vs Theoretical Mean  
+
+The **sample mean** is  
+
+```{r echo=TRUE}
+(sampleMean = mean(mns))
+```  
+
+The **theoretical mean** is  
+
+```{r echo=TRUE}
+(theoreticalMean=1/lambda)
+```  
+
+The **disparity** between the theoretical and the sample mean is  
+```{r echo=TRUE}
+printf("%.4f %%",100*(1-theoreticalMean/sampleMean))
+```
+
+## Sample Variance versus Theoretical Variance  
+The **sample variance** is  
+
+```{r echo=TRUE}
+(sampleVar = var(mns))
+```  
+
+The **theoretical variance** is  
+
+```{r echo=TRUE}
+(theoreticalVar=(1/lambda)^2/exp)
+``` 
+The **disparity between** the theoretical and the sample variance is  
+```{r echo=TRUE}
+printf("%.4f %%",100*(1-theoreticalVar/sampleVar))
+```
+## Distribution
+
+```{r echo = TRUE , warning = FALSE}
+labelSampleMean <- bquote(Sample~mean==.(sampleMean))
+labelTheoreticalMean <- bquote(Theoretical~mean~is~1/lambda==.(theoreticalMean))
+#  expression(paste("Theoretical mean=1/",lambda,"=",v.1))
+mnsDF <- data.frame(mns)
+g <- ggplot(mnsDF,aes(mns))
+g + geom_histogram(aes(y=..density..),color="blue",
+                   fill="lightblue",bins=30) +
+    geom_vline(aes(xintercept=mean(mns)),
+               color="blue",size=2,
+               linetype="twodash") + 
+    annotate(geom = "text", x=mean(mns)*1.35,y=.55,
+             label=labelTheoreticalMean, color= "red",
+             alpha= 0.7 ) + 
+    geom_vline(aes(xintercept=sampleMean),
+               color="red",size=2,
+               linetype="dotdash") + 
+    annotate(geom = "text", x=mean(mns)*1.4,y=.45,
+             label=labelSampleMean, color= "blue",
+             alpha= 0.7 ) +
+    stat_function(fun = dnorm,
+            args=list(mean=1/lambda,sd=theoreticalVar^(1/2)),
+              color = "red",size=1, alpha=.5) +
+    geom_density(color = "blue",size=1,alpha=.5)
+```  
+
+As we can see in the plot above, the density of the simulation (`r colorize("blue line","blue")`) is similar to the density of a normal distribution (`r colorize("red line","red")`). Also the means (vertical lines, `r colorize("blue for the sample mean","blue")` and `r colorize("red for the theoretical","red")`) are overlapped because they are pretty similar.
